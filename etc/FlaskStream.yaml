@@ -1,0 +1,50 @@
+loggin:
+  disable_existing_loggers: false
+  formatters:
+    normal:
+      datefmt: '%Y-%m-%dT%H:%M:%S%z'
+      format: '%(asctime)s %(levelname)-8s %(threadName)-24s %(funcName)-24s %(message)s'
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: normal
+      stream: ext://sys.stdout
+    file_handler:
+      backupCount: 30
+      class: 'logging.handlers.TimedRotatingFileHandler'
+      delay: true
+      encoding: 'utf8'
+      filename: './log/site1.log'
+      formatter: 'normal'
+      interval: 1
+      level: 'DEBUG'
+      when: 'midnight'
+    # sys:
+    #   address:
+    #   - 127.0.0.1
+    #   - 514
+    #   class: logging.handlers.SysLogHandler
+    #   facility: local5
+    #   formatter: syslog
+    Logstash_handler:
+      class: logstash.UDPLogstashHandler
+      host: 'ghostz7'
+      port: 5959 
+      version: 1 
+      message_type: docz1 # logstash
+      fqdn: False 
+      tags: ['FlaskStreaming', 'debug-version']
+      level: DEBUG
+  root:
+    handlers:
+    #- sys
+    #- file_handler
+    - console
+    #- Logstash_handler
+    level: 'DEBUG'
+  version: 1
+
+FlaskStreaming:
+  total: 3 # total imagesn
+  delay: 5 # delay entre imagens
