@@ -1,4 +1,5 @@
 import time
+import logging
 import threading
 try:
     from greenlet import getcurrent as get_ident
@@ -15,6 +16,7 @@ class CameraEvent(object):
     """
     def __init__(self):
         self.events = {}
+        self.log = logging.getLogger('FlaskStreaming')
 
     def wait(self):
         """Invoked from each client's thread to wait for the next frame."""
@@ -69,6 +71,8 @@ class BaseCamera(object):
             # wait until frames are available
             while self.get_frame() is None:
                 time.sleep(0)
+                
+        self.log = logging.getLogger('FlaskStreaming')
 
     def get_frame(self):
         """Return the current camera frame."""
@@ -88,7 +92,10 @@ class BaseCamera(object):
     @classmethod
     def _thread(cls):
         """Camera background thread."""
-        print('Starting camera thread.')
+
+        log = logging.getLogger('FlaskStreaming')
+
+        log.info('Starting camera thread.')
         frames_iterator = cls.frames()
         for frame in frames_iterator:
             BaseCamera.frame = frame
@@ -99,6 +106,7 @@ class BaseCamera(object):
             # the last 10 seconds then stop the thread
             if time.time() - BaseCamera.last_access > 10:
                 frames_iterator.close()
-                print('Stopping camera thread due to inactivity.')
+                log.info('Stopping camera thread due to inactivity.')
                 break
+            
         BaseCamera.thread = None
