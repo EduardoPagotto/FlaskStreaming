@@ -34,7 +34,11 @@ class Camera(BaseCamera):
 
     @staticmethod
     def getNext():
-        prox = Camera.imgs[int(time.time()) % Camera.tot_imges]
+
+        novo = time.time() % 3 # nova a cada 3 segundos
+        val = int(novo) % Camera.tot_imges
+
+        prox = Camera.imgs[val]
         with open(prox, 'rb') as file:
             data = file.read()
             return data
