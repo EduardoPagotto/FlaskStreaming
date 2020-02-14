@@ -110,3 +110,7 @@ class BaseCamera(object):
                 break
             
         BaseCamera.thread = None
+
+    @staticmethod
+    def hasAudience():
+        return True if BaseCamera.thread is not None else False 

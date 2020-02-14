@@ -70,5 +70,25 @@ def newzzxxccA1():
         raise InvalidUsage('Falha Arquivo: {0}'.format(str(exp)), status_code=404)
 
 
+@app.route('/hasAudienceNow', methods=['GET'])
+def hasAudienceNow():
+
+    if request.method == 'GET' is False:
+        raise InvalidUsage('GET invalido', status_code=404)
+
+    try:
+        val = Camera.hasAudience()
+        audience = {'hasAudience': val}
+
+        return app.response_class(
+            response=json.dumps(audience),
+            status=200,
+            mimetype='application/json'
+        )
+
+    except Exception as exp:
+        raise InvalidUsage('GET: {0}'.format(str(exp)), status_code=404)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True)
