@@ -7,6 +7,18 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },,
+        {
+            "name": "FlaskStreamm",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "./app.py",
+            "cwd": "${workspaceRoot}",
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "args": []
         }
     ]
 }

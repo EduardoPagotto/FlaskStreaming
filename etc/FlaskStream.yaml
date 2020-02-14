@@ -46,5 +46,5 @@ loggin:
   version: 1
 
 FlaskStreaming:
-  total: 3 # total imagesn
-  delay: 5 # delay entre imagens
+  total: 50 # total imagesn
+  delay: 3 # delay entre imagens

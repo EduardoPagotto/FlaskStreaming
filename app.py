@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+'''
+Created on 20200202
+Update on 20200214
+@author: Eduardo Pagotto
+'''
+
 from importlib import import_module
 import os
 from flask import Flask, render_template, Response, request
@@ -49,10 +55,14 @@ def newzzxxccA1():
         s_json_payload = s_payload.replace("'", "\"")
         payload = json.loads(s_json_payload)
 
-        name = payload['img']
+        name = payload['name']
+
+        # if 'tot' in payload:
+        #     Camera.tot_imges = int(payload['tot'])
+
         img = request.files['file']
         if img is not None:
-            img.save(name)
+            img.save('./imgs/{0}'.format(name))
 
         return "ok"
 
