@@ -57,8 +57,11 @@ def newzzxxccA1():
 
         name = payload['name']
 
-        # if 'tot' in payload:
-        #     Camera.tot_imges = int(payload['tot'])
+        if 'tot' in payload:
+            Camera.tot_imges = int(payload['tot'])
+
+        if 'delay' in payload:
+            Camera.delay = int(payload['delay'])
 
         img = request.files['file']
         if img is not None:
