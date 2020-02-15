@@ -1,0 +1,27 @@
+###Para ativar
+#cp FlaskStream.service /etc/systemd/system/
+#touch /etc/systemd/system/FlaskStream.service
+#chmod 664 /etc/systemd/system/FlaskStream.service
+#systemctl daemon-reload ;verifica todos os .service nos diretorios de services
+#systemctl enable FlaskStream ;para incluir no system
+##systemctl disable FlaskStream ;para desabilitar do system
+#systemctl start FlaskStream
+#
+
+[Unit]
+Description=FlaskStream subsystem - Linux Hosted
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=idle
+User=ubuntu
+WorkingDirectory=/home/ubuntu/FlaskStream
+ExecStart=/home/ubuntu/FlaskStream/app.py 
+ExecStop=/usr/bin/pkill -f /home/ubuntu/FlaskStream/app.py
+Restart=always
+RestartSec=15
+SyslogIdentifier=FlaskStream
+
+[Install]
+WantedBy=multi-user.target
