@@ -44,14 +44,15 @@ class Camera(BaseCamera):
 
     @staticmethod
     def getNext():
-
-        novo = int(time.time() % Camera.delay) # nova a cada 3 segundos
-        if novo == 0:
-            Camera.ultima = Camera.last % Camera.tot_imges
-            Camera.last += 1
-
+        reload = False
         while(True):
             try:
+                novo = int(time.time() % Camera.delay) # nova a cada 3 segundos
+                if novo == 0 or reload is True:
+                    reload = False
+                    Camera.ultima = Camera.last % Camera.tot_imges
+                    Camera.last += 1
+
                 prox = Camera.imgs[Camera.ultima]
                 print('Show: {0}'.format(prox))
                 #print('Novo:{0} Last:{1} Ultima:{2} img:{3}'.format(str(novo), str(Camera.last),str(Camera.ultima), str(prox)))
@@ -60,6 +61,7 @@ class Camera(BaseCamera):
                     return data
             except:
                 Camera.last = 0
+                reload = True
                 continue
 
     @staticmethod

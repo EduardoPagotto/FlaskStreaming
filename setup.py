@@ -53,7 +53,8 @@ setuptools.setup(
                       'Jinja2',
                       'MarkupSafe',
                       #'picamera',
-                      'Werkzeug'],
+                      'Werkzeug',
+                      'python3-logstash'],
         cmdclass={'develop': PostDevelopCommand,
                   'install': PostInstallCommand,}
 )
