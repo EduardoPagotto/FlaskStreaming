@@ -93,14 +93,14 @@ class GB():
         print('gb online')
         while(True):
             try:
-                if Camera.queue_out.empty() == False:
+                if Camera.queue_out.qsize() > 1:
                     image_name = Camera.queue_out.get(block=False)
                     os.remove(image_name)
                     print('gb removeu:' + str(image_name))
-                    time.sleep(1)
+                    time.sleep(0.5)
                     continue
                 else:
-                    time.sleep(15)
+                    time.sleep(5)
             except Exception as exp:
                 print('gb erro critico: ' + str(exp))
                 time.sleep(1)

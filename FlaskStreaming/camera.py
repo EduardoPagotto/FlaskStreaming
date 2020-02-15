@@ -27,9 +27,7 @@ class Camera(BaseCamera):
 
     config_file = './etc/FlaskStream.yaml' 
     appname = 'FlaskStreaming'
-
-    last = 0
-    ultima = 0
+    last_image = 'empty_img.jpg'
 
     with open(config_file, 'r') as stream:
         global_config = yaml.load(stream)
@@ -47,15 +45,22 @@ class Camera(BaseCamera):
                 image_name = Camera.queue_in.get(block=False)
                 with open(image_name, 'rb') as file:
                     data = file.read()
-
+                    Camera.last_image = image_name
+                
                 Camera.queue_out.put(image_name)
 
                 return data
             else:
                 time.sleep(1)
 
-        with open("empty_img.jpg", 'rb') as file:
+        # if (int(Camera.lastTimeHasAudience()) + 60) > int(time.time()):
+        #     Camera.last_image = 'empty_img.jpg'
+
+        with open(Camera.last_image, 'rb') as file:
             data = file.read()
+
+        # with open("empty_img.jpg", 'rb') as file:
+        #     data = file.read()
 
         return data     
 

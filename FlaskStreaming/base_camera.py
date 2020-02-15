@@ -59,6 +59,8 @@ class BaseCamera(object):
     last_access = 0  # time of last client access to the camera
     event = CameraEvent()
 
+    last_audience = time.time()
+
     def __init__(self):
         """Start the background camera thread if it isn't running yet."""
         if BaseCamera.thread is None:
@@ -113,4 +115,9 @@ class BaseCamera(object):
 
     @staticmethod
     def hasAudience():
+        BaseCamera.last_audience = time.time()
         return True if BaseCamera.thread is not None else False 
+
+    @staticmethod
+    def lastTimeHasAudience():
+        return BaseCamera.last_audience
