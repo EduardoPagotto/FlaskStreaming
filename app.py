@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
 '''
 Created on 20200202
-Update on 20200214
+Update on 20200215
 @author: Eduardo Pagotto
 '''
 
+import time
 from importlib import import_module
 import os
 from flask import Flask, render_template, Response, request
 
 import json
 
-# import camera driver
-# if os.environ.get('CAMERA'):
-#     Camera = import_module('camera_' + os.environ['CAMERA']).Camera
-# else:
 from FlaskStreaming.camera import Camera
 from InvalidUsage import InvalidUsage
 
-# Raspberry Pi camera module (requires picamera package)
-# from camera_pi import Camera
+import threading
+
+garbage_colector = None
 
 app = Flask(__name__)
-
 
 @app.route('/')
 def index():
     """Video streaming home page."""
     return render_template('index.html')
-
 
 def gen(camera):
     """Video streaming generator function."""
@@ -55,17 +51,14 @@ def newzzxxccA1():
         s_json_payload = s_payload.replace("'", "\"")
         payload = json.loads(s_json_payload)
 
-        name = payload['name']
-
-        if 'tot' in payload:
-            Camera.tot_imges = int(payload['tot'])
-
-        if 'delay' in payload:
-            Camera.delay = int(payload['delay'])
-
+        date = payload['date']
+        print('Enqueued: ' + str(date))
+        name_file = './imgs/{0}.jpg'.format(date)
         img = request.files['file']
         if img is not None:
-            img.save('./imgs/{0}'.format(name))
+          img.save(name_file)
+
+        Camera.queue_in.put(name_file)
 
         return "ok"
 
@@ -92,6 +85,37 @@ def hasAudienceNow():
     except Exception as exp:
         raise InvalidUsage('GET: {0}'.format(str(exp)), status_code=404)
 
+class GB():
+    def __init__(self, queue_out):
+        self.queue_out = queue_out
+
+    def execute(self):
+        print('gb online')
+        while(True):
+            try:
+                if Camera.queue_out.empty() == False:
+                    image_name = Camera.queue_out.get(block=False)
+                    os.remove(image_name)
+                    print('gb removeu:' + str(image_name))
+                    time.sleep(1)
+                    continue
+                else:
+                    time.sleep(15)
+            except Exception as exp:
+                print('gb erro critico: ' + str(exp))
+                time.sleep(1)
+
+@app.before_first_request
+def execute_inicializacao():
+    """[Inicaliza singleton do controle do scanner e batch]
+    """
+    global garbage_colector
+
+    if garbage_colector is None:
+        garbage_colector = GB(Camera.queue_out)
+        thread1 = threading.Thread(target=garbage_colector.execute, name='gb_execute')
+        thread1.setDaemon(True)
+        thread1.start()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', threaded=True)

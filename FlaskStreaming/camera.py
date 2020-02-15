@@ -10,6 +10,7 @@ from .base_camera import BaseCamera
 import logging
 import logging.config
 import yaml
+import queue
 
 class Camera(BaseCamera):
     """[sequencia as imagens]
@@ -21,7 +22,8 @@ class Camera(BaseCamera):
         [type] -- [description]
     """
 
-    tot_imges = 0
+    queue_in = queue.Queue()
+    queue_out = queue.Queue()
 
     config_file = './etc/FlaskStream.yaml' 
     appname = 'FlaskStreaming'
@@ -35,34 +37,27 @@ class Camera(BaseCamera):
         log = logging.getLogger(appname)
         log.info('>>>>>> Starting %s, loading setup file: %s',appname, config_file)
 
-        tot_imges = global_config[appname]['total']
-        delay = global_config[appname]['delay']
-
-    imgs = []
-    for i in range(tot_imges):
-        imgs.append('./imgs/{0}.jpg'.format(i))
-
     @staticmethod
     def getNext():
-        reload = False
-        while(True):
-            try:
-                novo = int(time.time() % Camera.delay) # nova a cada 3 segundos
-                if novo == 0 or reload is True:
-                    reload = False
-                    Camera.ultima = Camera.last % Camera.tot_imges
-                    Camera.last += 1
 
-                prox = Camera.imgs[Camera.ultima]
-                print('Show: {0}'.format(prox))
-                #print('Novo:{0} Last:{1} Ultima:{2} img:{3}'.format(str(novo), str(Camera.last),str(Camera.ultima), str(prox)))
-                with open(prox, 'rb') as file:
+        data = None
+        for _ in range(5):
+            if Camera.queue_in.empty() == False:
+
+                image_name = Camera.queue_in.get(block=False)
+                with open(image_name, 'rb') as file:
                     data = file.read()
-                    return data
-            except:
-                Camera.last = 0
-                reload = True
-                continue
+
+                Camera.queue_out.put(image_name)
+
+                return data
+            else:
+                time.sleep(1)
+
+        with open("empty_img.jpg", 'rb') as file:
+            data = file.read()
+
+        return data     
 
     @staticmethod
     def frames():
